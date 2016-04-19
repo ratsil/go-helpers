@@ -4,17 +4,18 @@ import (
 	"bytes"
 	"encoding/base64"
 	"net/smtp"
+	"net/url"
 	"strings"
 	"text/template"
-    dkim "github.com/toorop/go-dkim"
-	"net/url"
-//	"log"
+
+	dkim "github.com/toorop/go-dkim"
+	//	"log"
 )
 
 type DKIM struct {
-	Public *string
-	Private *string
-	Domain *string
+	Public   *string
+	Private  *string
+	Domain   *string
 	Selector *string
 }
 type IMailer interface {
@@ -28,8 +29,9 @@ type Mailer struct {
 	Port     *string
 	User     *string
 	Password *string
-	DKIM *DKIM
+	DKIM     *DKIM
 }
+
 func (this *Mailer) Send(aRecipients []string, aBytes []byte) error {
 	return smtp.SendMail(*this.Host+":"+*this.Port,
 		smtp.PlainAuth("",
@@ -79,38 +81,52 @@ func (this *SMTPController) Send(aRecipients []string, sSubject string, sBody st
 		sSubject,
 		sBody,
 	}
-	
+
 	var pBuffer *bytes.Buffer
 	pBuffer = new(bytes.Buffer)
 	oEmail := template.New("email")
-	if oEmail, err = oEmail.Parse(sHeaders); nil != err { return }
-	if err = oEmail.Execute(pBuffer, pSmtpTemplateData); nil != err { return }
+	if oEmail, err = oEmail.Parse(sHeaders); nil != err {
+		return
+	}
+	if err = oEmail.Execute(pBuffer, pSmtpTemplateData); nil != err {
+		return
+	}
 	sHeaders = pBuffer.String()
-	
+
 	pBuffer = new(bytes.Buffer)
 	oEmail = template.New("email")
-	if oEmail, err = oEmail.Parse("Subject: =?utf-8?B?{{.Subject}}?=\r\n\r\n"); nil != err { return }
-	if err = oEmail.Execute(pBuffer, pSmtpTemplateData); nil != err { return }
+	if oEmail, err = oEmail.Parse("Subject: =?utf-8?B?{{.Subject}}?=\r\n\r\n"); nil != err {
+		return
+	}
+	if err = oEmail.Execute(pBuffer, pSmtpTemplateData); nil != err {
+		return
+	}
 	sSubject = pBuffer.String()
-	
+
 	pBuffer = new(bytes.Buffer)
 	oEmail = template.New("email")
-	if oEmail, err = oEmail.Parse("<html><body>{{.Body}}</body></html>\r\n"); nil != err { return }
-	if err = oEmail.Execute(pBuffer, pSmtpTemplateData); nil != err { return }
+	if oEmail, err = oEmail.Parse("<html><body>{{.Body}}</body></html>\r\n"); nil != err {
+		return
+	}
+	if err = oEmail.Execute(pBuffer, pSmtpTemplateData); nil != err {
+		return
+	}
 	sBody = pBuffer.String()
-	aBytes := []byte(sHeaders+sSubject+sBody)
-	
+	aBytes := []byte(sHeaders + sSubject + sBody)
+
 	if pDKIM := this.Mailer.DKIMGet(); nil != pDKIM {
-	    oDKIMOptions := dkim.NewSigOptions()
-	    oDKIMOptions.PrivateKey = []byte(*pDKIM.Private)
-	    oDKIMOptions.Domain = *pDKIM.Domain
-	    oDKIMOptions.Selector = *pDKIM.Selector
-	    oDKIMOptions.SignatureExpireIn = 3600
-	    oDKIMOptions.BodyLength = uint(len(sBody))
-	    oDKIMOptions.Headers = []string{"from", "date", "mime-version", "received", "received"}
-	    oDKIMOptions.AddSignatureTimestamp = true
-	    oDKIMOptions.Canonicalization = "relaxed/relaxed"
-	    if err = dkim.Sign(&aBytes, oDKIMOptions); nil != err { return }
+		oDKIMOptions := dkim.NewSigOptions()
+		oDKIMOptions.PrivateKey = []byte(*pDKIM.Private)
+		oDKIMOptions.Domain = *pDKIM.Domain
+		oDKIMOptions.Selector = *pDKIM.Selector
+		oDKIMOptions.SignatureExpireIn = 3600
+		oDKIMOptions.BodyLength = uint(len(sBody))
+		oDKIMOptions.Headers = []string{"from", "date", "mime-version", "received", "received"}
+		oDKIMOptions.AddSignatureTimestamp = true
+		oDKIMOptions.Canonicalization = "relaxed/relaxed"
+		if err = dkim.Sign(&aBytes, oDKIMOptions); nil != err {
+			return
+		}
 	}
 	return this.Mailer.Send(aRecipients, aBytes)
 }
@@ -119,25 +135,33 @@ func (this *SMTPController) SendTemplate(aRecipients []string, sSubject, sBody s
 	var pEmail *template.Template
 	var aTemplateData []interface{}
 	switch pTemplateData.(type) {
-		case []interface{}:
-			aTemplateData = (pTemplateData).([]interface{})
-		default:
-			aTemplateData = append(aTemplateData, pTemplateData)
+	case []interface{}:
+		aTemplateData = (pTemplateData).([]interface{})
+	default:
+		aTemplateData = append(aTemplateData, pTemplateData)
 	}
 	if strings.Contains(sSubject, "{{") {
-		for _,pTemplateData = range aTemplateData {
+		for _, pTemplateData = range aTemplateData {
 			pEmail, err = template.New("email").Parse(sSubject)
-			if nil != err { return }
-			if err = pEmail.Execute(&oBuffer, pTemplateData); nil != err { return }
+			if nil != err {
+				return
+			}
+			if err = pEmail.Execute(&oBuffer, pTemplateData); nil != err {
+				return
+			}
 			sSubject = oBuffer.String()
 			oBuffer.Reset()
 		}
 	}
 	if strings.Contains(sBody, "{{") {
-		for _,pTemplateData = range aTemplateData {
+		for _, pTemplateData = range aTemplateData {
 			pEmail, err = template.New("email").Parse(sBody)
-			if nil != err { return }
-			if err = pEmail.Execute(&oBuffer, pTemplateData); nil != err { return }
+			if nil != err {
+				return
+			}
+			if err = pEmail.Execute(&oBuffer, pTemplateData); nil != err {
+				return
+			}
 			sBody = oBuffer.String()
 			oBuffer.Reset()
 		}

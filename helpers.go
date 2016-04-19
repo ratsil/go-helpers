@@ -1,4 +1,4 @@
-package go-helpers
+package helpers
 
 import (
 	crypto "crypto/md5"
@@ -27,12 +27,8 @@ const Uint64Min = 0
 const Int64Max = int64(Uint64Max >> 1)
 const Int64Min = -Int64Max - 1
 
-const IDNull = ID(Int64Max)
-
 var TimeMax = t.Unix(1<<63-62135596801, 999999999)
 var DTNull = TimeMax
-
-type ID int64
 
 func MD5(s string) string {
 	var aHash = crypto.Sum([]byte(s))

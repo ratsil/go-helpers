@@ -1,100 +1,11 @@
-package helpers
+package dbc
 
 import (
-	sc "strconv"
-	t "time"
+	. "github.com/ratsil/go-helpers"
 )
 
-func ToDT(oValue interface{}) t.Time {
-	if dt, b := oValue.(t.Time); b {
-		return dt
-	}
-	if nil != oValue {
-		if dt, err := t.Parse("2006-01-02 15:04:05.999999-07:00", oValue.(string)); nil == err {
-			return dt
-		}
-		if dt, err := t.Parse("2006-01-02 15:04:05.999+07", oValue.(string)); nil == err {
-			return dt
-		}
-	}
-	return TimeMax
-}
-func ToStr(oValue interface{}) *string {
-	defer func() { recover() }()
-	if nil == oValue {
-		return nil
-	}
-	if s, b := oValue.(string); b {
-		return &s
-	}
-	if dt, b := oValue.(t.Time); b {
-		s := dt.Format("2006-01-02 15:04:05.99")
-		return &s
-	}
-	if n, b := oValue.(float64); b {
-		s := sc.FormatFloat(n, 'f', -1, 64)
-		return &s
-	}
-	if n, b := oValue.(int64); b {
-		s := sc.FormatInt(n, 10)
-		return &s
-	}
-	if n, b := oValue.(int); b {
-		s := sc.FormatInt(int64(n), 10)
-		return &s
-	}
-	/*	if n, b := oValue.(ID); b {
-			s := sc.FormatInt(int64(n), 10)
-			return &s
-		}
-	*/
-	if s, b := oValue.(string); b {
-		return &s
-	}
-	return nil
-}
-
-func ToInt64(oValue interface{}) int64 {
-	defer func() { recover() }()
-	if n, b := oValue.(int64); b {
-		return n
-	}
-	if s, b := oValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 64); nil == err {
-			return n
-		}
-	}
-	return Int64Max
-}
-func ToLong(oValue interface{}) int64 {
-	return ToInt64(oValue)
-}
-func ToInt16(oValue interface{}) int16 {
-	defer func() { recover() }()
-	if n, b := oValue.(int16); b {
-		return n
-	}
-	if s, b := oValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 16); nil == err {
-			return int16(n)
-		}
-	}
-	return Int16Max
-}
-func ToShort(oValue interface{}) int16 {
-	return ToInt16(oValue)
-}
-func ToByte(oValue interface{}) byte {
-	defer func() { recover() }()
-	if n, b := oValue.(byte); b {
-		return n
-	}
-	if s, b := oValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 8); nil == err {
-			return byte(n)
-		}
-	}
-	return 255
+func ToID(oValue interface{}) ID {
+	return ID(ToInt64(oValue))
 }
 
 /*
