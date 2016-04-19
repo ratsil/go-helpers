@@ -1,9 +1,9 @@
-package dbc
+package types
 
 import (
 	t "time"
 
-	. "github.com/ratsil/go-helpers"
+	. "github.com/ratsil/go-helpers/common"
 )
 
 const IDNull = ID(Int64Max)

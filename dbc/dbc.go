@@ -6,7 +6,7 @@ import (
 	t "time"
 	//. "types"
 
-	. "github.com/ratsil/go-helpers"
+	. "github.com/ratsil/go-helpers/common"
 
 	_ "github.com/lib/pq"
 )

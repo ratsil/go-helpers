@@ -1,7 +1,7 @@
-package dbc
+package types
 
 import (
-	. "github.com/ratsil/go-helpers"
+	. "github.com/ratsil/go-helpers/common"
 )
 
 func ToID(oValue interface{}) ID {
