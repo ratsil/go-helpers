@@ -1,12 +1,11 @@
 package types
 
 import (
+	"math"
 	t "time"
-
-	. "github.com/ratsil/go-helpers/common"
 )
 
-const IDNull = ID(Int64Max)
+const IDNull = ID(math.MaxInt64)
 
 type ID int64
 

@@ -6,26 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"log"
+	"math"
 	"os"
 	"regexp"
 	"runtime"
 	t "time"
 )
-
-const UintMax = ^uint(0)
-const UintMin = 0
-const IntMax = int(UintMax >> 1)
-const IntMin = -IntMax - 1
-
-const Uint16Max = ^uint16(0)
-const Uint16Min = 0
-const Int16Max = int16(Uint16Max >> 1)
-const Int16Min = -Int16Max - 1
-
-const Uint64Max = ^uint64(0)
-const Uint64Min = 0
-const Int64Max = int64(Uint64Max >> 1)
-const Int64Min = -Int64Max - 1
 
 var TimeMax = t.Unix(1<<63-62135596801, 999999999)
 var DTNull = TimeMax
@@ -81,7 +67,7 @@ func IsEmpty(oValue interface{}) bool {
 		return TimeMax == dt
 	}
 	if n, b := oValue.(uint64); b {
-		return Uint64Max == n
+		return math.MaxUint64 == n
 	}
 	if s, b := oValue.(string); b {
 		return 1 > len(s)
@@ -89,9 +75,12 @@ func IsEmpty(oValue interface{}) bool {
 	return false
 }
 func LogError(err error) {
+	if nil == err {
+		return
+	}
 	var aBuf []byte
 	runtime.Stack(aBuf, false)
-	log.Println("error:", err, string(aBuf))
+	log.Print("error:", err, string(aBuf))
 }
 func LogErrorWithObject(err error, o interface{}) {
 	LogError(err)

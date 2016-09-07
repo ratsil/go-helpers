@@ -1,19 +1,37 @@
 package helpers
 
 import (
+	"math"
 	sc "strconv"
 	t "time"
+
+	. "github.com/ratsil/go-helpers/dbc/types"
 )
 
 func ToDT(oValue interface{}) t.Time {
 	if dt, b := oValue.(t.Time); b {
 		return dt
 	}
+	if dt, b := oValue.(*t.Time); b {
+		return *dt
+	}
 	if nil != oValue {
 		if dt, err := t.Parse("2006-01-02 15:04:05.999999-07:00", oValue.(string)); nil == err {
 			return dt
 		}
-		if dt, err := t.Parse("2006-01-02 15:04:05.999+07", oValue.(string)); nil == err {
+		if dt, err := t.Parse("2006-01-02 15:04:05.999999-07", oValue.(string)); nil == err {
+			return dt
+		}
+		if dt, err := t.Parse("2006-01-02 15:04:05.999-07", oValue.(string)); nil == err {
+			return dt
+		}
+		if dt, err := t.Parse("02.01.2006 15:04:05.999999-07:00", oValue.(string)); nil == err {
+			return dt
+		}
+		if dt, err := t.Parse("02.01.2006 15:04:05.999-07", oValue.(string)); nil == err {
+			return dt
+		}
+		if dt, err := t.Parse("02.01.2006", oValue.(string)); nil == err {
 			return dt
 		}
 	}
@@ -43,17 +61,28 @@ func ToStr(oValue interface{}) *string {
 		s := sc.FormatInt(int64(n), 10)
 		return &s
 	}
-	/*	if n, b := oValue.(ID); b {
-			s := sc.FormatInt(int64(n), 10)
-			return &s
-		}
-	*/
+	if n, b := oValue.(ID); b {
+		s := sc.FormatInt(int64(n), 10)
+		return &s
+	}
 	if s, b := oValue.(string); b {
 		return &s
 	}
 	return nil
 }
 
+func ToInt(oValue interface{}) int {
+	defer func() { recover() }()
+	if n, b := oValue.(int); b {
+		return n
+	}
+	if s, b := oValue.(string); b {
+		if n, err := sc.ParseInt(s, 10, 16); nil == err {
+			return int(n)
+		}
+	}
+	return math.MaxInt32
+}
 func ToInt64(oValue interface{}) int64 {
 	defer func() { recover() }()
 	if n, b := oValue.(int64); b {
@@ -64,7 +93,7 @@ func ToInt64(oValue interface{}) int64 {
 			return n
 		}
 	}
-	return Int64Max
+	return math.MaxInt64
 }
 func ToLong(oValue interface{}) int64 {
 	return ToInt64(oValue)
@@ -79,7 +108,7 @@ func ToInt16(oValue interface{}) int16 {
 			return int16(n)
 		}
 	}
-	return Int16Max
+	return math.MaxInt16
 }
 func ToShort(oValue interface{}) int16 {
 	return ToInt16(oValue)
@@ -95,6 +124,25 @@ func ToByte(oValue interface{}) byte {
 		}
 	}
 	return 255
+}
+func ToFloat64(oValue interface{}) float64 {
+	defer func() { recover() }()
+	if n, b := oValue.(float64); b {
+		return n
+	}
+	if s, b := oValue.(string); b {
+		if n, err := sc.ParseFloat(s, 64); nil == err {
+			return n
+		}
+	}
+	return math.MaxFloat64
+}
+func ToDouble(oValue interface{}) float64 {
+	return ToFloat64(oValue)
+}
+
+func ToID(oValue interface{}) ID {
+	return ID(ToInt64(oValue))
 }
 
 /*

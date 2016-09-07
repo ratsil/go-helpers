@@ -13,10 +13,10 @@ import (
 )
 
 type DKIM struct {
-	Public   *string
-	Private  *string
-	Domain   *string
-	Selector *string
+	Public   string `json:"public"`
+	Private  string `json:"private"`
+	Domain   string `json:"domain"`
+	Selector string `json:"selector"`
 }
 type IMailer interface {
 	SourceGet() string
@@ -25,29 +25,29 @@ type IMailer interface {
 	Send([]string, []byte) error
 }
 type Mailer struct {
-	Host     *string
-	Port     *string
-	User     *string
-	Password *string
-	DKIM     *DKIM
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	DKIM     *DKIM  `json:"dkim,omitempty"`
 }
 
 func (this *Mailer) Send(aRecipients []string, aBytes []byte) error {
-	return smtp.SendMail(*this.Host+":"+*this.Port,
+	return smtp.SendMail(this.Host+":"+this.Port,
 		smtp.PlainAuth("",
-			*this.User,
-			*this.Password,
-			*this.Host,
+			this.User,
+			this.Password,
+			this.Host,
 		),
-		*this.User,
+		this.User,
 		aRecipients,
 		aBytes)
 }
 func (this *Mailer) SourceGet() string {
-	return *this.User
+	return this.User
 }
 func (this *Mailer) SourceSet(sSource string) {
-	this.User = &sSource
+	this.User = sSource
 }
 func (this *Mailer) DKIMGet() *DKIM {
 	return this.DKIM
@@ -116,9 +116,9 @@ func (this *SMTPController) Send(aRecipients []string, sSubject string, sBody st
 
 	if pDKIM := this.Mailer.DKIMGet(); nil != pDKIM {
 		oDKIMOptions := dkim.NewSigOptions()
-		oDKIMOptions.PrivateKey = []byte(*pDKIM.Private)
-		oDKIMOptions.Domain = *pDKIM.Domain
-		oDKIMOptions.Selector = *pDKIM.Selector
+		oDKIMOptions.PrivateKey = []byte(pDKIM.Private)
+		oDKIMOptions.Domain = pDKIM.Domain
+		oDKIMOptions.Selector = pDKIM.Selector
 		oDKIMOptions.SignatureExpireIn = 3600
 		oDKIMOptions.BodyLength = uint(len(sBody))
 		oDKIMOptions.Headers = []string{"from", "date", "mime-version", "received", "received"}
