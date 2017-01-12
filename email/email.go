@@ -12,18 +12,23 @@ import (
 	//	"log"
 )
 
+//DKIM .
 type DKIM struct {
 	Public   string `json:"public"`
 	Private  string `json:"private"`
 	Domain   string `json:"domain"`
 	Selector string `json:"selector"`
 }
+
+//IMailer .
 type IMailer interface {
 	SourceGet() string
 	SourceSet(string)
 	DKIMGet() *DKIM
 	Send([]string, []byte) error
 }
+
+//Mailer .
 type Mailer struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
@@ -32,39 +37,49 @@ type Mailer struct {
 	DKIM     *DKIM  `json:"dkim,omitempty"`
 }
 
-func (this *Mailer) Send(aRecipients []string, aBytes []byte) error {
-	return smtp.SendMail(this.Host+":"+this.Port,
+//Send .
+func (th *Mailer) Send(aRecipients []string, aBytes []byte) error {
+	return smtp.SendMail(th.Host+":"+th.Port,
 		smtp.PlainAuth("",
-			this.User,
-			this.Password,
-			this.Host,
+			th.User,
+			th.Password,
+			th.Host,
 		),
-		this.User,
+		th.User,
 		aRecipients,
 		aBytes)
 }
-func (this *Mailer) SourceGet() string {
-	return this.User
-}
-func (this *Mailer) SourceSet(sSource string) {
-	this.User = sSource
-}
-func (this *Mailer) DKIMGet() *DKIM {
-	return this.DKIM
+
+//SourceGet .
+func (th *Mailer) SourceGet() string {
+	return th.User
 }
 
-type SmtpTemplateData struct {
+//SourceSet .
+func (th *Mailer) SourceSet(sSource string) {
+	th.User = sSource
+}
+
+//DKIMGet .
+func (th *Mailer) DKIMGet() *DKIM {
+	return th.DKIM
+}
+
+//SMTPTemplateData .
+type SMTPTemplateData struct {
 	From    string
 	To      string
 	Subject string
 	Body    string
 }
 
+//SMTPController .
 type SMTPController struct {
 	Mailer IMailer
 }
 
-func (this *SMTPController) Send(aRecipients []string, sSubject string, sBody string, sBcc string, oUnsubscribe url.URL) (err error) {
+//Send .
+func (th *SMTPController) Send(aRecipients []string, sSubject string, sBody string, sBcc string, oUnsubscribe url.URL) (err error) {
 	sHeaders := "From: {{.From}}\r\nReply-To: {{.From}}\r\nTo: {{.To}}\r\nMIME-Version: 1.0\r\nContent-type: text/html;charset=utf-8\r\n"
 	if 0 < len(sBcc) {
 		sHeaders += "Bcc: " + sBcc + "\r\n"
@@ -75,8 +90,8 @@ func (this *SMTPController) Send(aRecipients []string, sSubject string, sBody st
 	sSubjectBased := make([]byte, base64.StdEncoding.EncodedLen(len(sSubject)))
 	base64.StdEncoding.Encode(sSubjectBased, []byte(sSubject))
 	sSubject = string(sSubjectBased)
-	pSmtpTemplateData := &SmtpTemplateData{
-		this.Mailer.SourceGet(),
+	pSmtpTemplateData := &SMTPTemplateData{
+		th.Mailer.SourceGet(),
 		strings.Join(aRecipients, ","),
 		sSubject,
 		sBody,
@@ -114,7 +129,7 @@ func (this *SMTPController) Send(aRecipients []string, sSubject string, sBody st
 	sBody = pBuffer.String()
 	aBytes := []byte(sHeaders + sSubject + sBody)
 
-	if pDKIM := this.Mailer.DKIMGet(); nil != pDKIM {
+	if pDKIM := th.Mailer.DKIMGet(); nil != pDKIM {
 		oDKIMOptions := dkim.NewSigOptions()
 		oDKIMOptions.PrivateKey = []byte(pDKIM.Private)
 		oDKIMOptions.Domain = pDKIM.Domain
@@ -128,43 +143,37 @@ func (this *SMTPController) Send(aRecipients []string, sSubject string, sBody st
 			return
 		}
 	}
-	return this.Mailer.Send(aRecipients, aBytes)
+	return th.Mailer.Send(aRecipients, aBytes)
 }
-func (this *SMTPController) SendTemplate(aRecipients []string, sSubject, sBody string, sBcc string, oUnsubscribe url.URL, pTemplateData interface{}) (err error) {
+
+//SendTemplate .
+func (th *SMTPController) SendTemplate(aRecipients []string, sSubject, sBody string, sBcc string, oUnsubscribe url.URL, mTemplateData map[string]interface{}) (err error) {
 	var oBuffer bytes.Buffer
 	var pEmail *template.Template
-	var aTemplateData []interface{}
-	switch pTemplateData.(type) {
-	case []interface{}:
-		aTemplateData = (pTemplateData).([]interface{})
-	default:
-		aTemplateData = append(aTemplateData, pTemplateData)
+	if nil == mTemplateData {
+		mTemplateData = make(map[string]interface{})
 	}
 	if strings.Contains(sSubject, "{{") {
-		for _, pTemplateData = range aTemplateData {
-			pEmail, err = template.New("email").Parse(sSubject)
-			if nil != err {
-				return
-			}
-			if err = pEmail.Execute(&oBuffer, pTemplateData); nil != err {
-				return
-			}
-			sSubject = oBuffer.String()
-			oBuffer.Reset()
+		pEmail, err = template.New("email").Parse(sSubject)
+		if nil != err {
+			return
 		}
+		if err = pEmail.Execute(&oBuffer, mTemplateData); nil != err {
+			return err
+		}
+		sSubject = oBuffer.String()
+		oBuffer.Reset()
 	}
 	if strings.Contains(sBody, "{{") {
-		for _, pTemplateData = range aTemplateData {
-			pEmail, err = template.New("email").Parse(sBody)
-			if nil != err {
-				return
-			}
-			if err = pEmail.Execute(&oBuffer, pTemplateData); nil != err {
-				return
-			}
-			sBody = oBuffer.String()
-			oBuffer.Reset()
+		pEmail, err = template.New("email").Parse(sBody)
+		if nil != err {
+			return
 		}
+		if err = pEmail.Execute(&oBuffer, mTemplateData); nil != err {
+			return err
+		}
+		sBody = oBuffer.String()
+		oBuffer.Reset()
 	}
-	return this.Send(aRecipients, sSubject, sBody, sBcc, oUnsubscribe)
+	return th.Send(aRecipients, sSubject, sBody, sBcc, oUnsubscribe)
 }

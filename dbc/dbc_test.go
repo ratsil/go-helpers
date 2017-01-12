@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
+	sqlmock "github.com/DATA-DOG/go-sqlmock.v1"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
-var _nTestsQty int = 0
+var _nTestsQty int
 
 type Tests struct {
 	Assert *assert.Assertions
@@ -36,10 +36,10 @@ func Setup(t *testing.T) (pTests *Tests) {
 }
 
 //---------------------------------------------------------------------------
-func (this *TestDriver) Open() (pRetVal *sql.DB, err error) {
-	return this.DB, nil
+func (th *TestDriver) Open() (pRetVal *sql.DB, err error) {
+	return th.DB, nil
 }
-func (this *TestDriver) Close(pDB *sql.DB) {}
+func (th *TestDriver) Close(pDB *sql.DB) {}
 
 func Next() {
 	_nTestsQty++
