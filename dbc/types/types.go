@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"math"
 	sc "strconv"
 	t "time"
@@ -12,9 +13,20 @@ const IDNull = ID(math.MaxInt64)
 //ID .
 type ID int64
 
+//MarshalJSON .
+func (th ID) MarshalJSON() (aRetVal []byte, err error) {
+	aRetVal, err = json.Marshal(int64(th))
+	return
+}
+
 //MarshalText implements TextMarshaler
 func (th ID) MarshalText() (text []byte, err error) {
 	return []byte(sc.FormatInt(int64(th), 10)), nil
+}
+
+//IsEmpty .
+func (th ID) IsEmpty() bool {
+	return 1 > th || IDNull == th
 }
 
 //IRecord .
@@ -50,6 +62,16 @@ type Timed struct {
 //DtGet .
 func (th *Timed) DtGet() *t.Time {
 	return &th.Dt
+}
+
+//TimedNullable .
+type TimedNullable struct {
+	Dt *t.Time `json:"dt"`
+}
+
+//DtGet .
+func (th *TimedNullable) DtGet() *t.Time {
+	return th.Dt
 }
 
 //Dictionary .

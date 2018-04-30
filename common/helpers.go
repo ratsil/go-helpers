@@ -8,6 +8,7 @@ import (
 	"errors"
 	"math"
 	"os"
+	"reflect"
 	"regexp"
 	s "strings"
 	t "time"
@@ -47,6 +48,15 @@ func FileExists(s string) (bool, error) {
 	return true, err
 }
 
+//FileExists file's existance test
+func IsDir(s string) (bool, error) {
+	o, err := os.Stat(s)
+	if nil == err {
+		return o.IsDir(), nil
+	}
+	return false, err
+}
+
 //FileWriteAllBytes writes all bytes to a file
 func FileWriteAllBytes(sFile string, aBytes []byte) error {
 	pFile, err := os.OpenFile(sFile, os.O_CREATE|os.O_WRONLY, 0666)
@@ -70,18 +80,22 @@ func FileReadAllBytes(sFile string) (aBytes []byte, err error) {
 }
 
 //IsEmpty tests for nil/zero length/etc
-func IsEmpty(oValue interface{}) bool {
-	if nil == oValue {
+func IsEmpty(i interface{}) bool {
+	if nil == i {
 		return true
 	}
-	if dt, b := oValue.(t.Time); b {
+	if dt, b := i.(t.Time); b {
 		return TimeMax == dt
 	}
-	if n, b := oValue.(uint64); b {
+	if n, b := i.(uint64); b {
 		return math.MaxUint64 == n
 	}
-	if s, b := oValue.(string); b {
+	if s, b := i.(string); b {
 		return 1 > len(s)
+	}
+	defer func() { recover() }()
+	if i == nil || reflect.ValueOf(i).IsNil() {
+		return true
 	}
 	return false
 }

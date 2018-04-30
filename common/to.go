@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	sc "strconv"
+	"strings"
 	t "time"
 
 	. "github.com/ratsil/go-helpers/dbc/types"
@@ -20,26 +21,42 @@ func ToPDT(iValue interface{}) *t.Time {
 	if dt, b := iValue.(t.Time); b {
 		return &dt
 	}
-	if dt, err := t.Parse("2006-01-02T15:04:05-0700", iValue.(string)); nil == err {
-		return &dt
-	}
-	if dt, err := t.Parse("2006-01-02 15:04:05.999999-07:00", iValue.(string)); nil == err {
-		return &dt
-	}
-	if dt, err := t.Parse("2006-01-02 15:04:05.999999-07", iValue.(string)); nil == err {
-		return &dt
-	}
-	if dt, err := t.Parse("2006-01-02 15:04:05.999-07", iValue.(string)); nil == err {
-		return &dt
-	}
-	if dt, err := t.Parse("02.01.2006 15:04:05.999999-07:00", iValue.(string)); nil == err {
-		return &dt
-	}
-	if dt, err := t.Parse("02.01.2006 15:04:05.999-07", iValue.(string)); nil == err {
-		return &dt
-	}
-	if dt, err := t.Parse("02.01.2006", iValue.(string)); nil == err {
-		return &dt
+	if sValue, b := iValue.(string); b {
+		n := len(sValue)
+		if 18 < n {
+			if dt, err := t.Parse("2006-01-02T15:04:05-0700", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("2006-01-02 15:04:05.999999-07:00", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("2006-01-02 15:04:05.999999-07", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("2006-01-02 15:04:05.999-07", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("02.01.2006 15:04:05.999999-07:00", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("02.01.2006 15:04:05.999-07", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("02.01.2006 15:04:05", sValue); nil == err {
+				return &dt
+			}
+		} else if 9 < n {
+			if dt, err := t.Parse("02.01.2006", sValue); nil == err {
+				return &dt
+			}
+			if dt, err := t.Parse("2006-01-02", sValue); nil == err {
+				return &dt
+			}
+		} else {
+			if dt, err := t.Parse("20060102", sValue); nil == err {
+				return &dt
+			}
+		}
 	}
 	return nil
 }
@@ -97,6 +114,24 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
+	if n, b := iValue.(int32); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatInt(int64(n), 10)
+		}
+		return &s
+	}
+	if n, b := iValue.(uint); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatInt(int64(n), 10)
+		}
+		return &s
+	}
 	if n, b := iValue.(int64); b {
 		var s string
 		if 0 < len(a) {
@@ -138,7 +173,7 @@ func ToInt(iValue interface{}) int {
 		return n
 	}
 	if s, b := iValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 16); nil == err {
+		if n, err := sc.ParseInt(s, 10, 32); nil == err {
 			return int(n)
 		}
 	}
@@ -293,6 +328,31 @@ func Round(x float64, prec int) float64 {
 	}
 
 	return rounder / pow * sign
+}
+
+//ToBool .
+func ToBool(iValue interface{}) bool {
+	if nil != iValue {
+		if s, b := iValue.(string); b {
+			s = strings.ToLower(strings.TrimSpace(s))
+			return ("t" == s || "true" == s)
+		}
+	}
+	return false
+}
+
+//ToPBool .
+func ToPBool(iValue interface{}) *bool {
+	if nil == iValue {
+		return nil
+	}
+	if p, b := iValue.(*bool); b {
+		return p
+	}
+	if bValue, b := iValue.(bool); b {
+		return &bValue
+	}
+	return nil
 }
 
 /*
