@@ -121,6 +121,17 @@ func (th *DBController) QueryForID(sSQL string, args ...interface{}) (nRetVal ID
 	return
 }
 
+//QueryForInt .
+func (th *DBController) QueryForInt(sSQL string, args ...interface{}) (nRetVal int, err error) {
+	id, err := th.QueryForID(sSQL, args...)
+	if err != nil {
+		return
+	}
+	nRetVal = int(id)
+
+	return
+}
+
 //QueryForValue .
 func (th *DBController) QueryForValue(sSQL, sName string, args ...interface{}) (sRetVal string, err error) {
 	aDBValues, err := th.Query(sSQL, args...)
@@ -147,45 +158,35 @@ func (th *DBController) QueryForRow(sSQL string, args ...interface{}) (mRetVal m
 
 //Query .
 func (th *DBController) Query(sSQL string, args ...interface{}) (aRetVal []map[string]string, err error) {
-	if !th.IsOpen {
-		if err = th.Open(); nil != err {
-			return
-		}
-	}
-	var pRows *sql.Rows
-	if nil == th.pTransaction {
-		pRows, err = th.pDB.Query(sSQL, args...)
-	} else {
-		pRows, err = th.pTransaction.Query(sSQL, args...)
-	}
+	aRows, err := th.query(sSQL, args...)
 	if nil != err {
 		return
-	}
-
-	aColumns, err := pRows.Columns()
-	if nil != err {
-		return
-	}
-
-	aValues := make([]sql.RawBytes, len(aColumns))
-	aScanArgs := make([]interface{}, len(aValues))
-	for i := range aValues {
-		aScanArgs[i] = &aValues[i]
 	}
 	aRetVal = make([]map[string]string, 0, 0)
-	for pRows.Next() {
-		if err = pRows.Scan(aScanArgs...); nil != err {
-			return
-		}
+	for _, m := range aRows {
 		mValues := map[string]string{}
-
-		for i, col := range aValues {
-			mValues[aColumns[i]] = string(col)
+		for s, a := range m {
+			mValues[s] = string(a)
 		}
-
 		aRetVal = append(aRetVal, mValues)
 	}
-	err = pRows.Err()
+	return
+}
+
+//QueryForBytes .
+func (th *DBController) QueryForBytes(sSQL string, args ...interface{}) (aRetVal []map[string][]byte, err error) {
+	aRows, err := th.query(sSQL, args...)
+	if nil != err {
+		return
+	}
+	aRetVal = make([]map[string][]byte, 0, 0)
+	for _, m := range aRows {
+		mValues := map[string][]byte{}
+		for s, a := range m {
+			mValues[s] = a
+		}
+		aRetVal = append(aRetVal, mValues)
+	}
 	return
 }
 
@@ -197,6 +198,52 @@ func (th *DBController) Perform(sSQL string, args ...interface{}) (err error) {
 		}
 	}
 	_, err = th.exec(sSQL, args...)
+	return
+}
+
+func (th *DBController) query(sSQL string, args ...interface{}) (aRetVal []map[string][]byte, err error) {
+	if !th.IsOpen {
+		if err = th.Open(); nil != err {
+			return
+		}
+	}
+	var pRows *sql.Rows
+	//log.Notice(sSQL)
+	if nil == th.pTransaction {
+		pRows, err = th.pDB.Query(sSQL, args...)
+	} else {
+		pRows, err = th.pTransaction.Query(sSQL, args...)
+	}
+	if nil != err {
+		return
+	}
+	defer pRows.Close()
+
+	aColumns, err := pRows.Columns()
+	if nil != err {
+		return
+	}
+
+	aValues := make([]sql.RawBytes, len(aColumns))
+	aScanArgs := make([]interface{}, len(aValues))
+	for i := range aValues {
+		aScanArgs[i] = &aValues[i]
+	}
+	aRetVal = make([]map[string][]byte, 0, 0)
+	for pRows.Next() {
+		if err = pRows.Scan(aScanArgs...); nil != err {
+			return
+		}
+		mValues := map[string][]byte{}
+
+		for i, col := range aValues {
+			mValues[aColumns[i]] = make([]byte, len(col))
+			copy(mValues[aColumns[i]], []byte(col))
+		}
+
+		aRetVal = append(aRetVal, mValues)
+	}
+	err = pRows.Err()
 	return
 }
 
