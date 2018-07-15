@@ -96,6 +96,24 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		s := dt.Format(a[0].(string))
 		return &s
 	}
+	if n, b := iValue.(int8); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatInt(int64(n), 10)
+		}
+		return &s
+	}
+	if n, b := iValue.(int16); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatInt(int64(n), 10)
+		}
+		return &s
+	}
 	if n, b := iValue.(int); b {
 		var s string
 		if 0 < len(a) {
@@ -111,6 +129,33 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 			s = fmt.Sprintf(a[0].(string), n)
 		} else {
 			s = sc.FormatInt(n, 10)
+		}
+		return &s
+	}
+	if n, b := iValue.(uint8); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatUint(uint64(n), 10)
+		}
+		return &s
+	}
+	if n, b := iValue.(uint16); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatUint(uint64(n), 10)
+		}
+		return &s
+	}
+	if n, b := iValue.(uint); b {
+		var s string
+		if 0 < len(a) {
+			s = fmt.Sprintf(a[0].(string), n)
+		} else {
+			s = sc.FormatUint(uint64(n), 10)
 		}
 		return &s
 	}
