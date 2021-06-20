@@ -2,8 +2,10 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	sc "strconv"
+	s "strings"
 	t "time"
 )
 
@@ -78,4 +80,27 @@ func (th *TimedNullable) DtGet() *t.Time {
 type Dictionary struct {
 	Record
 	Named
+}
+
+//Point .
+type Point struct {
+	X float64
+	Y float64
+}
+
+//MarshalJSON .
+func (th *Point) MarshalJSON() ([]byte, error) {
+	if nil == th {
+		return []byte("null"), nil
+	}
+	return []byte(`"(` + fmt.Sprintf("%f", th.X) + "," + fmt.Sprintf("%f", th.Y) + `)"`), nil
+}
+
+//UnmarshalJSON .
+func (th *Point) UnmarshalJSON(b []byte) (err error) {
+	a := s.Split(s.Trim(string(b), `()"`), ",")
+	if th.X, err = sc.ParseFloat(a[0], 64); err == nil {
+		th.Y, err = sc.ParseFloat(a[1], 64)
+	}
+	return
 }

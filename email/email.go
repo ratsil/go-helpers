@@ -9,7 +9,6 @@ import (
 	"text/template"
 
 	dkim "github.com/toorop/go-dkim"
-	//	"log"
 )
 
 //DKIM .
@@ -39,12 +38,13 @@ type Mailer struct {
 
 //Send .
 func (th *Mailer) Send(aRecipients []string, aBytes []byte) error {
+	//log.Debug("2.5.3.2.5.1.1.2.1")
+	iAuth := smtp.PlainAuth("", th.User, th.Password, th.Host)
+	if 1 > len(th.Password) {
+		iAuth = nil
+	}
 	return smtp.SendMail(th.Host+":"+th.Port,
-		smtp.PlainAuth("",
-			th.User,
-			th.Password,
-			th.Host,
-		),
+		iAuth,
 		th.User,
 		aRecipients,
 		aBytes)
@@ -96,7 +96,7 @@ func (th *SMTPController) Send(aRecipients []string, sSubject string, sBody stri
 		sSubject,
 		sBody,
 	}
-
+	//log.Debug("2.5.3.2.5.1.1.1")
 	var pBuffer *bytes.Buffer
 	pBuffer = new(bytes.Buffer)
 	oEmail := template.New("email")
@@ -143,6 +143,7 @@ func (th *SMTPController) Send(aRecipients []string, sSubject string, sBody stri
 			return
 		}
 	}
+	//log.Debug("2.5.3.2.5.1.1.2")
 	return th.Mailer.Send(aRecipients, aBytes)
 }
 
@@ -175,5 +176,6 @@ func (th *SMTPController) SendTemplate(aRecipients []string, sSubject, sBody str
 		sBody = oBuffer.String()
 		oBuffer.Reset()
 	}
+	//log.Debug("2.5.3.2.5.1.1")
 	return th.Send(aRecipients, sSubject, sBody, sBcc, oUnsubscribe)
 }

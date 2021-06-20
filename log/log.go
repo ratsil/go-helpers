@@ -53,7 +53,16 @@ func writer() {
 			o.close()
 		}
 	}
-	defer fClose()
+
+	defer func() {
+		fmt.Println("start defer in log writer")
+		close(_oMessages)
+		for oMessage := range _oMessages {
+			fmt.Println(oMessage.Value)
+			oMessage.Logger.write(oMessage.Value)
+		}
+		fClose()
+	}()
 	var oMessage *message
 	for {
 		select {
