@@ -15,7 +15,7 @@ var (
 	_oMessages chan *message
 )
 
-//Logger .
+// Logger .
 type Logger struct {
 	nDay    int
 	sPath   string
@@ -33,7 +33,7 @@ func init() {
 	go writer()
 }
 
-//New .
+// New .
 func New(sPath, sPrefix string) *Logger {
 	return &Logger{
 		nDay:    t.Now().Day(),
@@ -42,7 +42,7 @@ func New(sPath, sPrefix string) *Logger {
 	}
 }
 
-//Default .
+// Default .
 func Default(sPath, sPrefix string) {
 	_pDefault = New(sPath, sPrefix)
 }
@@ -88,7 +88,7 @@ func (th *Logger) fileNameGet() string {
 	return th.sFile
 }
 
-//Notice .
+// Notice .
 func (th *Logger) Notice(sMessage string) {
 	_oMessages <- &message{
 		Logger: th,
@@ -96,14 +96,14 @@ func (th *Logger) Notice(sMessage string) {
 	}
 }
 
-//Warning .
+// Warning .
 func (th *Logger) Warning(err error) {
 	if nil != err {
 		th.Notice("WARNING:" + err.Error())
 	}
 }
 
-//Error .
+// Error .
 func (th *Logger) Error(err error) {
 	if nil != err {
 		th.Notice("ERROR:" + err.Error())
@@ -131,7 +131,7 @@ func (th *Logger) close() {
 	}
 }
 
-//Notice .
+// Notice .
 func Notice(sMessage string) {
 	if nil == _pDefault {
 		panic("no default log")
@@ -142,36 +142,37 @@ func Notice(sMessage string) {
 	}
 }
 
-//Printf .
+// Printf .
 func Printf(sMessage string, aArgs ...interface{}) {
 	Notice(fmt.Sprintf(sMessage, aArgs...))
 }
 
-//Print .
+// Print .
 func Print(iMessage interface{}) {
 	Notice(fmt.Sprintf("%v", iMessage))
 }
 
-//Debug .
+// Debug .
 func Debug(iMessage interface{}) {
 	DebugWithArgs("%v", iMessage)
 }
 
-//DebugWithArgs .
+// DebugWithArgs .
 func DebugWithArgs(sMessage string, aArgs ...interface{}) {
 	var aBuf []byte
 	runtime.Stack(aBuf, false)
 	Notice("DEBUG:" + fmt.Sprintf(sMessage, aArgs...) + "\n" + stackTrace())
 }
 
-//Warning .
-func Warning(err error) {
+// Warning .
+func Warning(err error) error {
 	if nil != err {
 		Notice("WARNING:" + err.Error())
 	}
+	return err
 }
 
-//Error .
+// Error .
 func Error(err error) error {
 	if nil != err {
 		var aBuf []byte
@@ -181,14 +182,15 @@ func Error(err error) error {
 	return err
 }
 
-//ErrorWithStack .
-func ErrorWithStack(err error) {
+// ErrorWithStack .
+func ErrorWithStack(err error) error {
 	if nil != err {
 		Notice("ERROR:" + err.Error() + "\n" + stackTrace())
 	}
+	return err
 }
 
-//Recover .
+// Recover .
 func Recover() (iRetVal interface{}) {
 	if iRetVal := recover(); nil != iRetVal {
 		Notice("RECOVER:" + fmt.Sprintf("%v", iRetVal) + "\n" + stackTrace())
@@ -197,7 +199,7 @@ func Recover() (iRetVal interface{}) {
 	return
 }
 
-//Fatal .
+// Fatal .
 func Fatal(err error) {
 	if nil == err {
 		return

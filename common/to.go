@@ -10,7 +10,7 @@ import (
 	. "github.com/ratsil/go-helpers/dbc/types"
 )
 
-//ToPDT .
+// ToPDT .
 func ToPDT(iValue interface{}) *t.Time {
 	if nil == iValue {
 		return nil
@@ -61,7 +61,7 @@ func ToPDT(iValue interface{}) *t.Time {
 	return nil
 }
 
-//ToDT .
+// ToDT .
 func ToDT(iValue interface{}) t.Time {
 	p := ToPDT(iValue)
 	if nil == p {
@@ -70,7 +70,7 @@ func ToDT(iValue interface{}) t.Time {
 	return *p
 }
 
-//ToPStr .
+// ToPStr .
 func ToPStr(iValue interface{}, a ...interface{}) *string {
 	defer func() { recover() }()
 	if nil == iValue {
@@ -81,6 +81,9 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 	}
 	if p, b := iValue.(*string); b {
 		return p
+	}
+	if a, b := iValue.([]byte); b {
+		return &[]string{string(a)}[0]
 	}
 	if dt, b := iValue.(*t.Time); b {
 		if 1 > len(a) {
@@ -193,7 +196,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 	return nil
 }
 
-//ToStr .
+// ToStr .
 func ToStr(iValue interface{}, a ...interface{}) string {
 	p := ToPStr(iValue, a...)
 	if nil == p {
@@ -202,7 +205,7 @@ func ToStr(iValue interface{}, a ...interface{}) string {
 	return *p
 }
 
-//ToInt .
+// ToInt .
 func ToInt(iValue interface{}) int {
 	defer func() { recover() }()
 	if n, b := iValue.(int); b {
@@ -216,7 +219,7 @@ func ToInt(iValue interface{}) int {
 	return math.MaxInt32
 }
 
-//ToInt64 .
+// ToInt64 .
 func ToInt64(iValue interface{}) int64 {
 	defer func() { recover() }()
 	if n, b := iValue.(int64); b {
@@ -230,12 +233,12 @@ func ToInt64(iValue interface{}) int64 {
 	return math.MaxInt64
 }
 
-//ToLong .
+// ToLong .
 func ToLong(iValue interface{}) int64 {
 	return ToInt64(iValue)
 }
 
-//ToInt16 .
+// ToInt16 .
 func ToInt16(iValue interface{}) int16 {
 	defer func() { recover() }()
 	if n, b := iValue.(int16); b {
@@ -249,12 +252,12 @@ func ToInt16(iValue interface{}) int16 {
 	return math.MaxInt16
 }
 
-//ToShort .
+// ToShort .
 func ToShort(iValue interface{}) int16 {
 	return ToInt16(iValue)
 }
 
-//ToUInt32 .
+// ToUInt32 .
 func ToUInt32(iValue interface{}) uint32 {
 	defer func() { recover() }()
 	if n, b := iValue.(uint32); b {
@@ -268,12 +271,12 @@ func ToUInt32(iValue interface{}) uint32 {
 	return math.MaxUint32
 }
 
-//ToUInt .
+// ToUInt .
 func ToUInt(iValue interface{}) uint {
 	return uint(ToUInt32(iValue))
 }
 
-//ToUInt64 .
+// ToUInt64 .
 func ToUInt64(iValue interface{}) uint64 {
 	defer func() { recover() }()
 	if n, b := iValue.(uint64); b {
@@ -287,12 +290,12 @@ func ToUInt64(iValue interface{}) uint64 {
 	return math.MaxUint64
 }
 
-//ToULong .
+// ToULong .
 func ToULong(iValue interface{}) uint64 {
 	return ToUInt64(iValue)
 }
 
-//ToByte .
+// ToByte .
 func ToByte(iValue interface{}) byte {
 	defer func() { recover() }()
 	if n, b := iValue.(byte); b {
@@ -306,7 +309,7 @@ func ToByte(iValue interface{}) byte {
 	return 255
 }
 
-//ToFloat64 .
+// ToFloat64 .
 func ToFloat64(iValue interface{}, a ...interface{}) (nRetVal float64) {
 	defer func() { recover() }()
 	nRetVal = math.MaxFloat64
@@ -330,17 +333,17 @@ func ToFloat64(iValue interface{}, a ...interface{}) (nRetVal float64) {
 	return
 }
 
-//ToDouble .
+// ToDouble .
 func ToDouble(iValue interface{}, a ...interface{}) float64 {
 	return ToFloat64(iValue, a...)
 }
 
-//ToID .
+// ToID .
 func ToID(iValue interface{}) ID {
 	return ID(ToInt64(iValue))
 }
 
-//Round .
+// Round .
 func Round(x float64, prec int) float64 {
 	if math.IsNaN(x) || math.IsInf(x, 0) {
 		return x
@@ -366,7 +369,7 @@ func Round(x float64, prec int) float64 {
 	return rounder / pow * sign
 }
 
-//ToBool .
+// ToBool .
 func ToBool(iValue interface{}) bool {
 	if nil != iValue {
 		if s, b := iValue.(string); b {
@@ -377,7 +380,7 @@ func ToBool(iValue interface{}) bool {
 	return false
 }
 
-//ToPBool .
+// ToPBool .
 func ToPBool(iValue interface{}) *bool {
 	if nil == iValue {
 		return nil
