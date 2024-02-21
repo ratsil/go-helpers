@@ -11,17 +11,17 @@ import (
 )
 
 // ToPDT .
-func ToPDT(iValue interface{}) *t.Time {
-	if nil == iValue {
+func ToPDT(i interface{}) *t.Time {
+	if nil == i {
 		return nil
 	}
-	if p, b := iValue.(*t.Time); b {
+	if p, b := i.(*t.Time); b {
 		return p
 	}
-	if dt, b := iValue.(t.Time); b {
+	if dt, b := i.(t.Time); b {
 		return &dt
 	}
-	if sValue, b := iValue.(string); b {
+	if sValue, b := i.(string); b {
 		n := len(sValue)
 		if 18 < n {
 			if dt, err := t.Parse("2006-01-02T15:04:05-0700", sValue); nil == err {
@@ -62,8 +62,8 @@ func ToPDT(iValue interface{}) *t.Time {
 }
 
 // ToDT .
-func ToDT(iValue interface{}) t.Time {
-	p := ToPDT(iValue)
+func ToDT(i interface{}) t.Time {
+	p := ToPDT(i)
 	if nil == p {
 		return DTNull
 	}
@@ -71,35 +71,35 @@ func ToDT(iValue interface{}) t.Time {
 }
 
 // ToPStr .
-func ToPStr(iValue interface{}, a ...interface{}) *string {
+func ToPStr(i interface{}, a ...interface{}) *string {
 	defer func() { recover() }()
-	if nil == iValue {
+	if nil == i {
 		return nil
 	}
-	if s, b := iValue.(string); b {
+	if s, b := i.(string); b {
 		return &s
 	}
-	if p, b := iValue.(*string); b {
+	if p, b := i.(*string); b {
 		return p
 	}
-	if a, b := iValue.([]byte); b {
+	if a, b := i.([]byte); b {
 		return &[]string{string(a)}[0]
 	}
-	if dt, b := iValue.(*t.Time); b {
+	if dt, b := i.(*t.Time); b {
 		if 1 > len(a) {
 			a = append(a, "2006-01-02 15:04:05.99")
 		}
 		s := dt.Format(a[0].(string))
 		return &s
 	}
-	if dt, b := iValue.(t.Time); b {
+	if dt, b := i.(t.Time); b {
 		if 1 > len(a) {
 			a = append(a, "2006-01-02 15:04:05.99")
 		}
 		s := dt.Format(a[0].(string))
 		return &s
 	}
-	if n, b := iValue.(int8); b {
+	if n, b := i.(int8); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -108,7 +108,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(int16); b {
+	if n, b := i.(int16); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -117,7 +117,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(int); b {
+	if n, b := i.(int); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -126,7 +126,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(int64); b {
+	if n, b := i.(int64); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -135,7 +135,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(uint8); b {
+	if n, b := i.(uint8); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -144,7 +144,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(uint16); b {
+	if n, b := i.(uint16); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -153,7 +153,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(uint); b {
+	if n, b := i.(uint); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -162,7 +162,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(uint64); b {
+	if n, b := i.(uint64); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -171,7 +171,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(ID); b {
+	if n, b := i.(ID); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -180,7 +180,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if n, b := iValue.(float64); b {
+	if n, b := i.(float64); b {
 		var s string
 		if 0 < len(a) {
 			s = fmt.Sprintf(a[0].(string), n)
@@ -189,7 +189,7 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 		}
 		return &s
 	}
-	if bb, b := iValue.(bool); b {
+	if bb, b := i.(bool); b {
 		s := sc.FormatBool(bb)
 		return &s
 	}
@@ -197,36 +197,42 @@ func ToPStr(iValue interface{}, a ...interface{}) *string {
 }
 
 // ToStr .
-func ToStr(iValue interface{}, a ...interface{}) string {
-	p := ToPStr(iValue, a...)
+func ToStr(i interface{}, a ...interface{}) string {
+	p := ToPStr(i, a...)
 	if nil == p {
 		return ""
 	}
 	return *p
 }
 
-// ToInt .
-func ToInt(iValue interface{}) int {
-	defer func() { recover() }()
-	if n, b := iValue.(int); b {
-		return n
-	}
-	if s, b := iValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 32); nil == err {
-			return int(n)
-		}
-	}
-	return math.MaxInt32
-}
-
 // ToInt64 .
-func ToInt64(iValue interface{}) int64 {
+func ToInt64(i interface{}) int64 {
 	defer func() { recover() }()
-	if n, b := iValue.(int64); b {
-		return n
-	}
-	if s, b := iValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 64); nil == err {
+	switch v := i.(type) {
+	case nil:
+		return math.MaxInt64
+	case int:
+		return int64(v)
+	case int8:
+		return int64(v)
+	case int16:
+		return int64(v)
+	case int64:
+		return v
+	case uint:
+		return int64(v)
+	case uint8:
+		return int64(v)
+	case uint16:
+		return int64(v)
+	case uint64:
+		return int64(v)
+	case float32:
+		return int64(v)
+	case float64:
+		return int64(v)
+	case string:
+		if n, err := sc.ParseInt(v, 10, 64); nil == err {
 			return n
 		}
 	}
@@ -234,99 +240,148 @@ func ToInt64(iValue interface{}) int64 {
 }
 
 // ToLong .
-func ToLong(iValue interface{}) int64 {
-	return ToInt64(iValue)
+func ToLong(i interface{}) int64 {
+	return ToInt64(i)
 }
 
 // ToInt16 .
-func ToInt16(iValue interface{}) int16 {
-	defer func() { recover() }()
-	if n, b := iValue.(int16); b {
-		return n
+func ToInt16(i interface{}) int16 {
+	v := ToInt64(i)
+	if v != math.MaxInt64 {
+		return int16(v)
 	}
-	if s, b := iValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 16); nil == err {
-			return int16(n)
-		}
+	return math.MaxInt16
+}
+
+// ToInt8 .
+func ToInt8(i interface{}) int16 {
+	v := ToInt64(i)
+	if v != math.MaxInt64 {
+		return int16(v)
 	}
 	return math.MaxInt16
 }
 
 // ToShort .
-func ToShort(iValue interface{}) int16 {
-	return ToInt16(iValue)
+func ToShort(i interface{}) int16 {
+	return ToInt16(i)
 }
 
-// ToUInt32 .
-func ToUInt32(iValue interface{}) uint32 {
-	defer func() { recover() }()
-	if n, b := iValue.(uint32); b {
-		return n
+// ToInt .
+func ToInt(i interface{}) int {
+	v := ToInt64(i)
+	if v != math.MaxInt64 {
+		return int(v)
 	}
-	if s, b := iValue.(string); b {
-		if n, err := sc.ParseUint(s, 10, 32); nil == err {
-			return uint32(n)
-		}
-	}
-	return math.MaxUint32
-}
-
-// ToUInt .
-func ToUInt(iValue interface{}) uint {
-	return uint(ToUInt32(iValue))
+	return math.MaxInt32
 }
 
 // ToUInt64 .
-func ToUInt64(iValue interface{}) uint64 {
+func ToUInt64(i interface{}) uint64 {
 	defer func() { recover() }()
-	if n, b := iValue.(uint64); b {
-		return n
-	}
-	if s, b := iValue.(string); b {
-		if n, err := sc.ParseUint(s, 10, 64); nil == err {
+	switch v := i.(type) {
+	case nil:
+		return math.MaxUint64
+	case int:
+		return uint64(v)
+	case int8:
+		return uint64(v)
+	case int16:
+		return uint64(v)
+	case int64:
+		return uint64(v)
+	case uint:
+		return uint64(v)
+	case uint8:
+		return uint64(v)
+	case uint16:
+		return uint64(v)
+	case uint64:
+		return v
+	case float32:
+		return uint64(v)
+	case float64:
+		return uint64(v)
+	case string:
+		if n, err := sc.ParseUint(v, 10, 64); nil == err {
 			return n
 		}
 	}
-	return math.MaxUint64
+	ret = math.MaxUint64
 }
 
 // ToULong .
-func ToULong(iValue interface{}) uint64 {
-	return ToUInt64(iValue)
+func ToULong(i interface{}) uint64 {
+	ret = ToUInt64(i)
+}
+
+// ToUInt32 .
+func ToUInt32(i interface{}) uint32 {
+	v := ToUInt64(i)
+	if v != math.MaxInt64 {
+		ret = uint32(v)
+	}
+	ret = math.MaxUint32
+}
+
+// ToUInt .
+func ToUInt(i interface{}) uint {
+	v := ToUInt64(i)
+	if v != math.MaxInt64 {
+		ret = uint(v)
+	}
+	ret = math.MaxUint
+}
+
+// ToUInt8 .
+func ToUInt8(i interface{}) uint8 {
+	v := ToUInt64(i)
+	if v != math.MaxInt64 {
+		return uint8(v)
+	}
+	return math.MaxUint8
 }
 
 // ToByte .
-func ToByte(iValue interface{}) byte {
-	defer func() { recover() }()
-	if n, b := iValue.(byte); b {
-		return n
-	}
-	if s, b := iValue.(string); b {
-		if n, err := sc.ParseInt(s, 10, 8); nil == err {
-			return byte(n)
-		}
-	}
-	return 255
+func ToByte(i interface{}) byte {
+	return byte(ToUInt8(i))
 }
 
 // ToFloat64 .
-func ToFloat64(iValue interface{}, a ...interface{}) (nRetVal float64) {
+func ToFloat64(i interface{}, a ...interface{}) (ret float64) {
 	defer func() { recover() }()
-	nRetVal = math.MaxFloat64
-	if n, b := iValue.(float64); b {
-		nRetVal = n
-	} else {
-		if s, b := iValue.(string); b {
-			if n, err := sc.ParseFloat(s, 64); nil == err {
-				nRetVal = n
-			}
+	ret = math.MaxFloat64
+	switch v := i.(type) {
+	case int:
+		ret = float64(v)
+	case int8:
+		ret = float64(v)
+	case int16:
+		ret = float64(v)
+	case int64:
+		ret = float64(v)
+	case uint:
+		ret = float64(v)
+	case uint8:
+		ret = float64(v)
+	case uint16:
+		ret = float64(v)
+	case uint64:
+		ret = float64(v)
+	case float32:
+		ret = float64(v)
+	case float64:
+		ret = v
+	case string:
+		if n, err := sc.ParseFloat(v, 64); nil == err {
+			ret = n
 		}
 	}
-	if math.MaxFloat64 > nRetVal {
+	if math.MaxFloat64 > ret {
 		if 0 < len(a) {
 			if n, b := a[0].(int); b {
 				n *= 10
-				nRetVal = math.Floor(nRetVal*float64(n)) / float64(n)
+				ret = math.Floor(ret*float64(n)) / float64(n)
 			}
 		}
 	}
@@ -334,13 +389,13 @@ func ToFloat64(iValue interface{}, a ...interface{}) (nRetVal float64) {
 }
 
 // ToDouble .
-func ToDouble(iValue interface{}, a ...interface{}) float64 {
-	return ToFloat64(iValue, a...)
+func ToDouble(i interface{}, a ...interface{}) float64 {
+	return ToFloat64(i, a...)
 }
 
 // ToID .
-func ToID(iValue interface{}) ID {
-	return ID(ToInt64(iValue))
+func ToID(i interface{}) ID {
+	return ID(ToInt64(i))
 }
 
 // Round .
@@ -370,9 +425,9 @@ func Round(x float64, prec int) float64 {
 }
 
 // ToBool .
-func ToBool(iValue interface{}) bool {
-	if nil != iValue {
-		if s, b := iValue.(string); b {
+func ToBool(i interface{}) bool {
+	if nil != i {
+		if s, b := i.(string); b {
 			s = strings.ToLower(strings.TrimSpace(s))
 			return ("t" == s || "true" == s)
 		}
@@ -381,106 +436,106 @@ func ToBool(iValue interface{}) bool {
 }
 
 // ToPBool .
-func ToPBool(iValue interface{}) *bool {
-	if nil == iValue {
+func ToPBool(i interface{}) *bool {
+	if nil == i {
 		return nil
 	}
-	if p, b := iValue.(*bool); b {
+	if p, b := i.(*bool); b {
 		return p
 	}
-	if bValue, b := iValue.(bool); b {
+	if bValue, b := i.(bool); b {
 		return &bValue
 	}
 	return nil
 }
 
 /*
-func ToByte(iValue interface{}) byte
+func ToByte(i interface{}) byte
 {
-	if iValue is byte)
-		return (byte)iValue;
+	if i is byte)
+		return (byte)i;
 	byte nRetVal = byte.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToByte(iValue);
+			nRetVal = Convert.ToByte(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func short ToInt16(iValue interface{})
+func short ToInt16(i interface{})
 {
-	if iValue is short)
-		return (short)iValue;
+	if i is short)
+		return (short)i;
 	short nRetVal = short.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToInt16(iValue);
+			nRetVal = Convert.ToInt16(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func ushort ToUInt16(iValue interface{})
+func ushort ToUInt16(i interface{})
 {
-	if iValue is ushort)
-		return (ushort)iValue;
+	if i is ushort)
+		return (ushort)i;
 	ushort nRetVal = ushort.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToUInt16(iValue);
+			nRetVal = Convert.ToUInt16(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func short ToShort(iValue interface{})
+func short ToShort(i interface{})
 {
-	return iValue.ToInt16();
+	return i.ToInt16();
 }
-func ushort ToUShort(iValue interface{})
+func ushort ToUShort(i interface{})
 {
-	return iValue.ToUInt16();
+	return i.ToUInt16();
 }
-func int ToInt32(iValue interface{})
+func int ToInt32(i interface{})
 {
-	if iValue is int)
-		return (int)iValue;
+	if i is int)
+		return (int)i;
 	int nRetVal = int.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToInt32(iValue);
+			nRetVal = Convert.ToInt32(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func uint ToUInt32(iValue interface{})
+func uint ToUInt32(i interface{})
 {
-	if iValue is uint)
-		return (uint)iValue;
+	if i is uint)
+		return (uint)i;
 	uint nRetVal = uint.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToUInt32(iValue);
+			nRetVal = Convert.ToUInt32(i);
 		}
 		catch
 		{
-			if iValue is string && ((string)iValue).StartsWith("0x"))
+			if i is string && ((string)i).StartsWith("0x"))
 			{
 				try
 				{
-					nRetVal = Convert.ToUInt32((string)iValue, 16);
+					nRetVal = Convert.ToUInt32((string)i, 16);
 				}
 				catch { }
 			}
@@ -488,127 +543,127 @@ func uint ToUInt32(iValue interface{})
 	}
 	return nRetVal;
 }
-func int ToInt(iValue interface{})
+func int ToInt(i interface{})
 {
-	return iValue.ToInt32();
+	return i.ToInt32();
 }
-func uint ToUInt(iValue interface{})
+func uint ToUInt(i interface{})
 {
-	return iValue.ToUInt32();
+	return i.ToUInt32();
 }
-func long ToInt64(iValue interface{})
+func long ToInt64(i interface{})
 {
-	if iValue is long)
-		return (long)iValue;
+	if i is long)
+		return (long)i;
 	long nRetVal = long.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToInt64(iValue);
+			nRetVal = Convert.ToInt64(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func ulong ToUInt64(iValue interface{})
+func ulong ToUInt64(i interface{})
 {
-	if iValue is ulong)
-		return (ulong)iValue;
+	if i is ulong)
+		return (ulong)i;
 	ulong nRetVal = ulong.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			nRetVal = Convert.ToUInt64(iValue);
+			nRetVal = Convert.ToUInt64(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func long ToLong(iValue interface{})
+func long ToLong(i interface{})
 {
-	return iValue.ToInt64();
+	return i.ToInt64();
 }
-func ulong ToULong(iValue interface{})
+func ulong ToULong(i interface{})
 {
-	return iValue.ToUInt64();
+	return i.ToUInt64();
 }
-func double ToDouble(this object iValue)
+func double ToDouble(this object i)
 {
-	return iValue.ToDouble(nil);
+	return i.ToDouble(nil);
 }
-func double ToDouble(this object iValue, ushort nDecimals)
+func double ToDouble(this object i, ushort nDecimals)
 {
-	return Math.Round(iValue.ToDouble(nil), nDecimals);
+	return Math.Round(i.ToDouble(nil), nDecimals);
 }
-func double ToDouble(this object iValue, IFormatProvider iFormatProvider)
+func double ToDouble(this object i, IFormatProvider iFormatProvider)
 {
-	if iValue is double)
-		return (double)iValue;
+	if i is double)
+		return (double)i;
 	double nRetVal = double.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			if(iValue is byte[])
-				nRetVal = ((byte[])iValue).ToDouble(0, false);
+			if(i is byte[])
+				nRetVal = ((byte[])i).ToDouble(0, false);
 			else
-				nRetVal = Convert.ToDouble(iValue, iFormatProvider);
+				nRetVal = Convert.ToDouble(i, iFormatProvider);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func float ToFloat(iValue interface{})
+func float ToFloat(i interface{})
 {
-	if iValue is float)
-		return (float)iValue;
+	if i is float)
+		return (float)i;
 	float nRetVal = float.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			if iValue is string)
+			if i is string)
 			{
-				string sValue = (string)iValue;
+				string sValue = (string)i;
 				sValue = sValue.Replace(".", ",");
 				nRetVal = Convert.ToSingle(sValue);
 			}
 			else
-				nRetVal = Convert.ToSingle(iValue);
+				nRetVal = Convert.ToSingle(i);
 		}
 		catch { }
 	}
 	return nRetVal;
 }
-func float ToSingle(iValue interface{})
+func float ToSingle(i interface{})
 {
-	return ToFloat(iValue);
+	return ToFloat(i);
 }
-func uint ToCount(iValue interface{})
+func uint ToCount(i interface{})
 {
-	if nil == iValue)
+	if nil == i)
 		return 0;
-	return iValue.ToUInt();
+	return i.ToUInt();
 }
-func bool ToBool(iValue interface{})
+func bool ToBool(i interface{})
 {
-	if nil == iValue)
+	if nil == i)
 		return false;
-	string sValue = iValue.ToString().Trim().ToLower();
+	string sValue = i.ToString().Trim().ToLower();
 	if 0 == sValue.Length || "false" == sValue)
 		return false;
 	if "true" == sValue)
 		return true;
 	try
 	{
-		return Convert.ToBoolean(iValue);
+		return Convert.ToBoolean(i);
 	}
 	catch { }
 	try
 	{
-		return (0 < iValue.ToInt32() ? true : false);
+		return (0 < i.ToInt32() ? true : false);
 	}
 	catch { }
 	return false;
@@ -744,23 +799,23 @@ func double ToDouble(this byte[] aBytes, bool bReverse)
 	return aBytes.ToDouble(0, bReverse);
 }
 
-func TimeSpan ToTS(iValue interface{})
+func TimeSpan ToTS(i interface{})
 {
-	if iValue is TimeSpan)
-		return (TimeSpan)iValue;
+	if i is TimeSpan)
+		return (TimeSpan)i;
 
 	TimeSpan tsRetVal = TimeSpan.MaxValue;
-	if nil != iValue)
+	if nil != i)
 	{
 		try
 		{
-			tsRetVal = (TimeSpan)iValue;
+			tsRetVal = (TimeSpan)i;
 		}
 		catch
 		{
 			try
 			{
-				string sValue = iValue.ToString();
+				string sValue = i.ToString();
 				if sValue.Contains("day"))  // pgsql returns TS like '7 days 00:44:24'
 					sValue = sValue.Replace(" days ", ".").Remove(" days").Replace(" day ", ".").Remove(" day");
 				tsRetVal = TimeSpan.Parse(sValue);
@@ -770,70 +825,70 @@ func TimeSpan ToTS(iValue interface{})
 	}
 	return tsRetVal;
 }
-func IPAddress ToIP(iValue interface{})
+func IPAddress ToIP(i interface{})
 {
-	if iValue is IPAddress)
-		return (IPAddress)iValue;
+	if i is IPAddress)
+		return (IPAddress)i;
 	IPAddress cRetVal = nil;
-	if nil != iValue)
+	if nil != i)
 	{
-		if !(iValue is string))
+		if !(i is string))
 		{
 			try
 			{
-				cRetVal = (IPAddress)iValue;
+				cRetVal = (IPAddress)i;
 			}
 			catch { }
 		}
-		cRetVal = cRetVal ?? IPAddress.Parse(iValue.ToString());
+		cRetVal = cRetVal ?? IPAddress.Parse(i.ToString());
 	}
 	return cRetVal;
 }
 
-func T To<T>(iValue interface{})
+func T To<T>(i interface{})
 {
 	Type t = typeof(T);
 	if t.IsEnum)
 	{
 		try
 		{
-			iValue = Enum.Parse(t, iValue.ToString().Trim(), true);
+			i = Enum.Parse(t, i.ToString().Trim(), true);
 		}
 		catch
 		{
-			if iValue.GetType().IsEnum)
-				iValue = ((Enum)iValue).Translate(t); //теоретически мы сюда никогда не должны попасть... т.к. в этом случае будет выбран: func TEnum To<TEnum>(this Enum eValue)
+			if i.GetType().IsEnum)
+				i = ((Enum)i).Translate(t); //теоретически мы сюда никогда не должны попасть... т.к. в этом случае будет выбран: func TEnum To<TEnum>(this Enum eValue)
 			else
-				iValue = iValue.Translate(t);
+				i = i.Translate(t);
 		}
 	}
 	else if t == typeof(byte))
-		iValue = iValue.ToByte();
+		i = i.ToByte();
 	else if t == typeof(short))
-		iValue = iValue.ToInt16();
+		i = i.ToInt16();
 	else if t == typeof(ushort))
-		iValue = iValue.ToUInt16();
+		i = i.ToUInt16();
 	else if t == typeof(int))
-		iValue = iValue.ToInt32();
+		i = i.ToInt32();
 	else if t == typeof(uint))
-		iValue = iValue.ToUInt32();
+		i = i.ToUInt32();
 	else if t == typeof(long))
-		iValue = iValue.ToInt64();
+		i = i.ToInt64();
 	else if t == typeof(ulong))
-		iValue = iValue.ToUInt64();
+		i = i.ToUInt64();
 	else if t == typeof(bool))
-		iValue = iValue.ToBool();
+		i = i.ToBool();
 	else if t == typeof(float))
-		iValue = iValue.ToFloat();
+		i = i.ToFloat();
 	else if t == typeof(string))
-		iValue = iValue.ToStr();
+		i = i.ToStr();
 	else if t == typeof(time.Time))
-		iValue = iValue.ToDT();
+		i = i.ToDT();
 	else if t == typeof(TimeSpan))
-		iValue = iValue.ToTS();
+		i = i.ToTS();
 	else if t == typeof(IPAddress))
-		iValue = iValue.ToIP();
-	return (T)iValue;
+		i = i.ToIP();
+	return (T)i;
 }
 
 func TEnum To<TEnum>(this Enum eValue)

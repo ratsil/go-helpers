@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"go.useLanguageServer": true,
+		"git.ignoreLimitWarning": true
+	}
+}
