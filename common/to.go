@@ -307,30 +307,30 @@ func ToUInt64(i interface{}) uint64 {
 			return n
 		}
 	}
-	ret = math.MaxUint64
+	return math.MaxUint64
 }
 
 // ToULong .
 func ToULong(i interface{}) uint64 {
-	ret = ToUInt64(i)
+	return ToUInt64(i)
 }
 
 // ToUInt32 .
 func ToUInt32(i interface{}) uint32 {
 	v := ToUInt64(i)
 	if v != math.MaxInt64 {
-		ret = uint32(v)
+		return uint32(v)
 	}
-	ret = math.MaxUint32
+	return math.MaxUint32
 }
 
 // ToUInt .
 func ToUInt(i interface{}) uint {
 	v := ToUInt64(i)
 	if v != math.MaxInt64 {
-		ret = uint(v)
+		return uint(v)
 	}
-	ret = math.MaxUint
+	return math.MaxUint
 }
 
 // ToUInt8 .
