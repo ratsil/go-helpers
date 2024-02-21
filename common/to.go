@@ -253,18 +253,18 @@ func ToInt16(i interface{}) int16 {
 	return math.MaxInt16
 }
 
-// ToInt8 .
-func ToInt8(i interface{}) int16 {
-	v := ToInt64(i)
-	if v != math.MaxInt64 {
-		return int16(v)
-	}
-	return math.MaxInt16
-}
-
 // ToShort .
 func ToShort(i interface{}) int16 {
 	return ToInt16(i)
+}
+
+// ToInt8 .
+func ToInt8(i interface{}) int8 {
+	v := ToInt64(i)
+	if v != math.MaxInt64 {
+		return int8(v)
+	}
+	return math.MaxInt8
 }
 
 // ToInt .
