@@ -172,6 +172,13 @@ func Warning(err error) error {
 	return err
 }
 
+func WarningWithStack(err error) error {
+	if nil != err {
+		Notice("WARNING:" + err.Error() + "\n" + stackTrace())
+	}
+	return err
+}
+
 // Error .
 func Error(err error) error {
 	if nil != err {
